@@ -1,0 +1,28 @@
+# التشغيل:  docker compose up -d --build
+# السجلات:  docker compose logs -f app
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      - ./data:/app/data
+      - ./email_template.html:/app/email_template.html:ro
+    # إن كان لديك nginx أو Caddy مسبقاً على الخادم، احذف خدمة caddy أدناه
+    # ووجّه النطاق إلى 127.0.0.1:8080
+    ports:
+      - "127.0.0.1:8080:8080"
+
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+    depends_on: [app]
+
+volumes:
+  caddy_data:

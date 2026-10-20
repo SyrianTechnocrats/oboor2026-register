@@ -1,0 +1,4 @@
+# Caddy يصدر شهادة HTTPS تلقائياً. غيّر النطاق إن لزم.
+register-api.syrian-technocrats.org {
+  reverse_proxy app:8080
+}

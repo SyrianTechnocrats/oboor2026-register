@@ -1,0 +1,14 @@
+# بديل بدون Docker:  sudo cp sto-register.service /etc/systemd/system/ && sudo systemctl enable --now sto-register
+[Unit]
+Description=STO registration API
+After=network.target
+
+[Service]
+WorkingDirectory=/opt/sto-register
+ExecStart=/usr/bin/python3 /opt/sto-register/server.py
+Restart=always
+User=www-data
+Environment=HOST=127.0.0.1
+
+[Install]
+WantedBy=multi-user.target
