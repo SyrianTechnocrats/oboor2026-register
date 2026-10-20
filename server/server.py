@@ -100,6 +100,33 @@ def log(*a):
     print(datetime.now().strftime("%Y-%m-%d %H:%M:%S"), *a, flush=True)
 
 
+# ======================== رمز التحقق ========================
+# كل تسجيل له رمز من 6 أحرف يُحسب من رقم التسجيل ومفتاح سري على الخادم فقط.
+# من ينسخ رسالة واتساب أو يعدّلها لا يستطيع اختراع رمز صحيح لرقم تسجيل آخر.
+
+CODE_ALPHABET = "ABCDEFGHJKMNPQRSTUVWXYZ23456789"
+
+
+def verify_secret():
+    s = env("VERIFY_SECRET")
+    if s:
+        return s.encode()
+    path = os.path.join(os.path.dirname(CFG["db"]), "verify.key")
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    if not os.path.exists(path):
+        with open(path, "w") as f:
+            f.write(os.urandom(32).hex())
+        os.chmod(path, 0o600)
+    with open(path) as f:
+        return f.read().strip().encode()
+
+
+def verify_code(reg_id):
+    import hashlib
+    d = hmac.new(verify_secret(), reg_id.encode(), hashlib.sha256).digest()
+    return "".join(CODE_ALPHABET[b % len(CODE_ALPHABET)] for b in d[:6])
+
+
 # ======================== قاعدة البيانات ========================
 
 DB_LOCK = threading.Lock()
@@ -143,6 +170,10 @@ def init_db():
             );
             """
         )
+        cols = {r[1] for r in con.execute("PRAGMA table_info(registrations)")}
+        if "wa_number" not in cols:
+            con.execute("ALTER TABLE registrations ADD COLUMN wa_number TEXT")
+            con.execute("ALTER TABLE registrations ADD COLUMN wa_checked_at TEXT")
 
 
 def normalize_phone(v):
@@ -212,7 +243,8 @@ def register(data, ip):
         threading.Thread(target=send_and_record, args=(seq,), daemon=True).start()
 
     log("registered", reg_id)
-    return {"ok": True, "id": reg_id, "emailSent": bool(CFG["mail_enabled"] and email)}
+    return {"ok": True, "id": reg_id, "code": verify_code(reg_id),
+            "emailSent": bool(CFG["mail_enabled"] and email)}
 
 
 # ======================== البريد ========================
@@ -294,7 +326,7 @@ def resend_failed():
 
 # ======================== تصدير Excel ========================
 
-BASE_COLS = [("_id", "رقم التسجيل"), ("_time", "وقت التسجيل")]
+BASE_COLS = [("_id", "رقم التسجيل"), ("_code", "رمز التحقق"), ("_wa", "رقم واتساب المؤكَّد"), ("_time", "وقت التسجيل")]
 TECH_COLS = [("_email", "حالة بريد التأكيد"), ("_phone", "الرقم (موحّد)"), ("_device", "معرّف الجهاز"),
              ("_fp", "بصمة الجهاز"), ("_ua", "المتصفح"), ("_ip", "عنوان IP")]
 
@@ -309,7 +341,7 @@ def export_rows(event=None):
     for r in regs:
         f = json.loads(r["fields_json"])
         rows.append(
-            [r["reg_id"], r["created_at"]] + [f.get(k, "") for k, _ in cols] +
+            [r["reg_id"], verify_code(r["reg_id"]), r["wa_number"] or "", r["created_at"]] + [f.get(k, "") for k, _ in cols] +
             [r["email_status"] or "", r["phone"] or "", r["device_id"], r["fingerprint"] or "",
              r["user_agent"] or "", r["ip"] or ""]
         )
@@ -431,10 +463,21 @@ ADMIN_PAGE = """<!doctype html><html lang="ar" dir="rtl"><head><meta charset="ut
 .box{{max-width:640px;margin:auto;background:#fff;border:1px solid #D5DEEC;border-radius:14px;padding:22px}}
 h1{{margin:0 0 4px;font-size:1.3rem}} .n{{font-size:2.4rem;font-weight:700}} .muted{{color:#5A6788;font-size:.9rem}}
 a.btn{{display:inline-block;background:#13235B;color:#fff;text-decoration:none;padding:12px 18px;border-radius:10px;margin-top:12px}}
-table{{width:100%;border-collapse:collapse;margin-top:18px;font-size:.9rem}} td,th{{text-align:right;padding:6px;border-bottom:1px solid #eee}}</style>
+table{{width:100%;border-collapse:collapse;margin-top:18px;font-size:.9rem}} td,th{{text-align:right;padding:6px;border-bottom:1px solid #eee}}
+h2{{font-size:1.05rem;margin:26px 0 4px}} .vf{{display:grid;gap:8px;margin-top:10px}}
+.vf input{{font:inherit;padding:10px;border:1.5px solid #D5DEEC;border-radius:10px}} .vf button{{font:inherit;background:#1D7FDB;color:#fff;border:0;padding:11px;border-radius:10px;cursor:pointer}}
+.res{{border-radius:12px;padding:14px 16px;margin-top:16px}} .ok{{background:#E5F5EF;color:#0E6B53}} .bad{{background:#FBE9EB;color:#A3202D}} .warn{{background:#FFF4D6;color:#6B4E00}}
+.res b{{display:block;font-size:1.1rem;margin-bottom:4px}} a.back{{display:inline-block;margin-top:14px;color:#1D7FDB}}</style>
 </head><body><div class="box"><h1>تسجيلات {event}</h1><p class="muted">آخر تحديث: {now}</p>
 <div class="n">{count}</div><div class="muted">تسجيل · البريد المرسل: {sent} · لم يُرسل: {failed}</div>
 <a class="btn" href="/admin/export.xlsx">تنزيل ملف Excel</a>
+<h2>التحقق من رسالة واتساب</h2>
+<p class="muted">انسخ من الرسالة رقم التسجيل ورمز التحقق، وأضف رقم واتساب المرسِل ليُربط بالتسجيل.</p>
+<form method="get" action="/admin/verify" class="vf">
+<input name="id" placeholder="رقم التسجيل OBR-0001" required dir="ltr">
+<input name="code" placeholder="رمز التحقق" required dir="ltr">
+<input name="wa" placeholder="رقم واتساب المرسِل (اختياري)" dir="ltr">
+<button type="submit">تحقّق</button></form>
 <table><tr><th>الفئة</th><th>العدد</th></tr>{groups}</table></div></body></html>"""
 
 
@@ -512,6 +555,8 @@ class Handler(BaseHTTPRequestHandler):
                 self.send_header("Cache-Control", "no-store")
                 self.end_headers()
                 return self.wfile.write(data)
+            if path == "/admin/verify":
+                return self.admin_verify()
             if path == "/admin":
                 with db() as con:
                     count = con.execute("SELECT COUNT(*) FROM registrations").fetchone()[0]
@@ -532,6 +577,54 @@ class Handler(BaseHTTPRequestHandler):
                 self.end_headers()
                 return self.wfile.write(page)
         self.send_json(404, {"ok": False, "error": "not_found"})
+
+
+    def admin_verify(self):
+        from urllib.parse import parse_qs
+        q = parse_qs(urlparse(self.path).query)
+        rid = (q.get("id", [""])[0]).strip().upper()
+        code = (q.get("code", [""])[0]).strip().upper().replace(" ", "")
+        wa = normalize_phone(q.get("wa", [""])[0])
+        with db() as con:
+            r = con.execute("SELECT * FROM registrations WHERE reg_id=?", (rid,)).fetchone()
+        if not r:
+            box = '<div class="res bad"><b>✗ رقم تسجيل غير موجود</b>الرسالة مزيفة أو فيها خطأ في الرقم.</div>'
+        elif not hmac.compare_digest(verify_code(rid), code):
+            box = ('<div class="res bad"><b>✗ رمز التحقق غير صحيح</b>رقم التسجيل موجود، لكن الرمز لا يطابقه. '
+                   'الرسالة على الأرجح معدّلة أو منسوخة.</div>')
+        else:
+            f = json.loads(r["fields_json"])
+            info = (f"الاسم: {html.escape(r['first_name'] + ' ' + r['last_name'])}<br>"
+                    f"البريد: {html.escape(r['email'] or '—')}<br>"
+                    f"الصفة: {html.escape(f.get('role', '—'))}<br>"
+                    f"وقت التسجيل: {html.escape(r['created_at'])}")
+            known = r["wa_number"]
+            if wa and not known:
+                with DB_LOCK, db() as con:
+                    con.execute("UPDATE registrations SET wa_number=?, wa_checked_at=? WHERE seq=?",
+                                (wa, now_iso(), r["seq"]))
+                box = (f'<div class="res ok"><b>✓ تسجيل صحيح</b>{info}<br>'
+                       f'رُبط رقم واتساب <span dir="ltr">+{html.escape(wa)}</span> بهذا التسجيل.</div>')
+            elif wa and known and known != wa:
+                box = (f'<div class="res warn"><b>⚠ الرمز صحيح لكن من رقم مختلف</b>{info}<br>'
+                       f'هذا التسجيل مرتبط مسبقاً برقم <span dir="ltr">+{html.escape(known)}</span>، '
+                       f'والرسالة الحالية من <span dir="ltr">+{html.escape(wa)}</span>. '
+                       f'على الأرجح شخص نسخ رسالة غيره.</div>')
+            else:
+                extra = (f'<br>رقم واتساب المرتبط: <span dir="ltr">+{html.escape(known)}</span>' if known else '')
+                box = f'<div class="res ok"><b>✓ تسجيل صحيح</b>{info}{extra}</div>'
+        page = ("<!doctype html><html lang='ar' dir='rtl'><head><meta charset='utf-8'>"
+                "<meta name='viewport' content='width=device-width, initial-scale=1'><title>التحقق</title>"
+                + ADMIN_PAGE.split("<style>")[1].split("</style>")[0].replace("{{", "{").replace("}}", "}").join(["<style>", "</style>"])
+                + "</head><body><div class='box'><h1>نتيجة التحقق</h1>"
+                f"<p class='muted' dir='ltr'>{html.escape(rid)} · {html.escape(code)}</p>{box}"
+                "<a class='back' href='/admin'>رجوع</a></div></body></html>").encode()
+        self.send_response(200)
+        self.send_header("Content-Type", "text/html; charset=utf-8")
+        self.send_header("Content-Length", str(len(page)))
+        self.send_header("Cache-Control", "no-store")
+        self.end_headers()
+        self.wfile.write(page)
 
     def do_POST(self):
         path = urlparse(self.path).path
