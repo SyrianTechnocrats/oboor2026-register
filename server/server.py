@@ -278,6 +278,12 @@ def send_mail(to, vars_):
     msg["Message-ID"] = make_msgid(domain=CFG["mail_from"].split("@")[-1])
     msg.set_content(text)
     msg.add_alternative(body_html, subtype="html")
+    # الشعار مدمج داخل الرسالة (cid:logo) فيظهر دون تحميل صور خارجية
+    logo_path = os.path.join(BASE, "email_logo.png")
+    if "cid:logo" in body_html and os.path.exists(logo_path):
+        with open(logo_path, "rb") as f:
+            msg.get_payload()[1].add_related(f.read(), "image", "png", cid="<logo>",
+                                             disposition="inline", filename="logo.png")
 
     ctx = ssl.create_default_context()
     if CFG["smtp_tls"] == "none":
