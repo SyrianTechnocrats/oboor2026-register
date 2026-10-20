@@ -102,7 +102,7 @@ docker compose exec app python3 server.py testmail you@example.com
 ## تخصيص التصميم (`config.json`)
 
 - **الألوان والخط — `theme`:** `primary` (العناوين والزر)، `accent` و `accentLight` (التدرج والتركيز)، `background`، `surface` (البطاقة)، `text`، `muted`، `border`، `error`، `success`، `radius`. الخط: `fontFamily` + `fontUrl`. الخط الحالي مستضاف داخل المستودع (`assets/fonts/`) حتى لا تُحمَّل أي ملفات من Google.
-- **الصور:** `logo` (الشعار في الأعلى)، و `coverImage` (غلاف اختياري؛ اتركه `""` لإخفائه).
+- **الصور:** `logo` (شعار المؤسسة في الأعلى)، `eventLogo` (شعار الفعالية بجانبه، اتركه `""` لإخفائه)، و `coverImage` (غلاف اختياري؛ اتركه `""` لإخفائه).
 - **الجهات المشاركة — `partners`:** كل عنصر `{ "name": "…", "logo": "assets/…png", "url": "https://…" }`. القائمة الفارغة `[]` تخفي القسم.
 - **النصوص:** `eyebrow`، `heading`، `subheading`، وكل الرسائل في `texts`. `{{firstName}}` و `{{email}}` تُستبدل ببيانات المشارك.
 - **رسالة واتساب — `whatsappMessage`:** `{{fields}}` = كل الأجوبة، `{{id}}` = رقم التسجيل.

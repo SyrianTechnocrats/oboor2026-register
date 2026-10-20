@@ -156,6 +156,13 @@
     document.title = cfg.pageTitle || document.title;
     if (cfg.logo) $("logo").src = cfg.logo;
     if (cfg.logoAlt) $("logo").alt = cfg.logoAlt;
+    if (cfg.eventLogo) {
+      $("logo2").src = cfg.eventLogo;
+      $("logo2").alt = cfg.eventLogoAlt || "";
+      $("logo2").hidden = false;
+      $("brand-sep").hidden = false;
+      document.querySelector(".brand").classList.add("dual");
+    }
     if (cfg.coverImage) { $("cover").src = cfg.coverImage; $("cover").hidden = false; }
     $("eyebrow").textContent = cfg.eyebrow || "";
     $("eyebrow").hidden = !cfg.eyebrow;

@@ -52,8 +52,12 @@ body {
   gap: 20px;
 }
 
-.brand { display: flex; justify-content: center; }
-.brand-logo { width: min(260px, 70%); height: auto; }
+.brand { display: flex; justify-content: center; align-items: center; gap: 18px; }
+.brand-logo { width: min(260px, 70%); height: auto; min-width: 0; }
+.brand.dual .brand-logo { width: auto; height: 78px; max-width: 46%; object-fit: contain; }
+.brand.dual .brand-logo-event { height: 84px; }
+.brand-sep { width: 1.5px; align-self: stretch; margin-block: 6px; background: var(--border); }
+@media (max-width: 380px) { .brand.dual .brand-logo { height: 62px; } .brand.dual .brand-logo-event { height: 68px; } .brand { gap: 12px; } }
 
 .card {
   background: var(--surface);

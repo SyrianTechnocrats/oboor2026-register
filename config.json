@@ -13,6 +13,8 @@
 
   "logo": "assets/logo.png",
   "logoAlt": "التكنوقراط السوريون",
+  "eventLogo": "assets/obour-logo.png",
+  "eventLogoAlt": "ملتقى عبور للابتكار والاستثمار ٢٠٢٦",
   "coverImage": "",
 
   "theme": {
