@@ -569,6 +569,8 @@ def main():
     if len(sys.argv) > 1 and sys.argv[1] == "resend":
         return resend_failed()
     if len(sys.argv) > 2 and sys.argv[1] == "testmail":
+        if not EMAIL_RE.match(sys.argv[2]) or not sys.argv[2].isascii():
+            return print("اكتب عنوان بريد صحيحاً، مثل: name@example.com")
         send_mail(sys.argv[2], {"id": "TEST-0000", "firstName": "تجربة", "lastName": "", "role": "—"})
         return print("أُرسلت رسالة تجريبية إلى", sys.argv[2])
     if not CFG["admin_pass"]:
