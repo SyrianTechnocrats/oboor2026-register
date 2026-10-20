@@ -1,0 +1,12 @@
+# للخوادم التي يعمل عليها nginx مسبقاً: التطبيق فقط، على منفذ محلي، و nginx يمرّر إليه
+# التشغيل: docker compose -f docker-compose.nginx.yml up -d --build
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      - ./data:/app/data
+      - ./email_template.html:/app/email_template.html:ro
+    ports:
+      - "127.0.0.1:8787:8080"
