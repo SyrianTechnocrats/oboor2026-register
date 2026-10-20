@@ -1,0 +1,135 @@
+{
+  "_comment": "كل إعدادات الصفحة هنا. عدّل هذا الملف فقط، ولا حاجة لتعديل الكود. الشرح الكامل في README.md",
+
+  "eventId": "oboor2026",
+  "pageTitle": "التسجيل | ملتقى عبور ٢٠٢٦",
+  "eyebrow": "مؤسسة التكنوقراط السوريون",
+  "heading": "استمارة التسجيل في ملتقى عبور ٢٠٢٦",
+  "subheading": "ملتقى عبور للابتكار والاستثمار. يستغرق التسجيل أقل من دقيقة.",
+
+  "whatsappNumber": "447861392622",
+  "scriptUrl": "",
+  "allowDesktop": false,
+
+  "logo": "assets/logo.png",
+  "logoAlt": "التكنوقراط السوريون",
+  "coverImage": "",
+
+  "theme": {
+    "primary": "#13235B",
+    "accent": "#1D7FDB",
+    "accentLight": "#19BDEB",
+    "background": "#EEF3FA",
+    "surface": "#FFFFFF",
+    "text": "#13235B",
+    "muted": "#5A6788",
+    "border": "#D5DEEC",
+    "error": "#C62D3A",
+    "success": "#13866A",
+    "fontFamily": "IBM Plex Sans Arabic",
+    "fontUrl": "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;700&display=swap",
+    "radius": "14px"
+  },
+
+  "partnersTitle": "الجهات المشاركة",
+  "partners": [
+    { "name": "التكنوقراط السوريون", "logo": "assets/logo.png", "url": "https://syrian-technocrats.org" }
+  ],
+
+  "groups": {
+    "academic": "طلاب وباحثون وأساتذة",
+    "founder": "رواد أعمال",
+    "investor": "مستثمرون",
+    "institution": "جهات حكومية ومنظمات",
+    "professional": "قطاع خاص وفئات أخرى"
+  },
+
+  "lists": {
+    "sectors": [
+      "التكنولوجيا الحيوية",
+      "الطب والعلوم الصحية",
+      "تكنولوجيا المعلومات والذكاء الاصطناعي",
+      "الهندسة",
+      "إدارة الأعمال والاقتصاد",
+      { "label": "أخرى", "specify": true }
+    ]
+  },
+
+  "fields": [
+    { "key": "firstName", "label": "الاسم الأول", "columnLabel": "الاسم الأول", "half": true },
+    { "key": "lastName", "label": "اسم العائلة", "columnLabel": "اسم العائلة", "half": true },
+
+    { "key": "email", "label": "البريد الإلكتروني", "columnLabel": "البريد الإلكتروني", "type": "email",
+      "required": true, "placeholder": "name@example.com", "help": "سنرسل تأكيد التسجيل إلى هذا البريد" },
+
+    { "key": "country", "label": "بلد الإقامة الحالي", "columnLabel": "بلد الإقامة", "type": "country",
+      "required": true, "pinned": ["SY"], "placeholder": "اختر الدولة" },
+
+    { "key": "role", "label": "ما هي الصفة التي تمثلك بشكل أفضل؟", "columnLabel": "الصفة",
+      "groupColumnLabel": "الفئة", "type": "radio", "required": true,
+      "options": [
+        { "label": "طالب جامعي – بكالوريوس", "group": "academic" },
+        { "label": "طالب دراسات عليا – ماجستير", "group": "academic" },
+        { "label": "طالب دراسات عليا – دكتوراه", "group": "academic" },
+        { "label": "باحث علمي / أستاذ جامعي", "group": "academic" },
+        { "label": "رائد أعمال / مؤسس شركة ناشئة", "group": "founder" },
+        { "label": "مستثمر / مستثمر ملائكي", "group": "investor" },
+        { "label": "ممثل جهة حكومية أو مؤسسة عامة", "group": "institution" },
+        { "label": "ممثل منظمة غير حكومية / منظمة دولية / جهة مانحة", "group": "institution" },
+        { "label": "موظف أو خبير في القطاع الخاص", "group": "professional" },
+        { "label": "أخرى (يرجى التحديد)", "value": "أخرى", "group": "professional", "specify": true }
+      ] },
+
+    { "key": "member", "label": "أنا عضو في مؤسسة التكنوقراط السوريون", "columnLabel": "عضو في المؤسسة",
+      "type": "checkbox", "attached": true, "trueValue": "نعم", "falseValue": "لا" },
+
+    { "key": "domain", "type": "conditional", "on": "role", "required": true,
+      "columnLabel": "الاختصاص / القطاع",
+      "rules": [
+        { "when": ["academic"], "label": "ما هو اختصاصك العلمي؟", "messageLabel": "الاختصاص",
+          "type": "select", "options": "@sectors", "placeholder": "اختر الاختصاص" },
+        { "when": ["founder"], "label": "في أي قطاع يعمل مشروعك؟", "messageLabel": "قطاع المشروع",
+          "type": "select", "options": "@sectors", "placeholder": "اختر القطاع" },
+        { "when": ["investor"], "label": "ما هي القطاعات التي تهتم بالاستثمار فيها؟", "messageLabel": "قطاعات الاهتمام",
+          "type": "checkboxes", "options": "@sectors", "help": "يمكنك اختيار أكثر من قطاع" },
+        { "when": ["institution"], "key": "organization", "columnLabel": "الجهة الممثَّلة",
+          "label": "ما اسم المؤسسة أو الجهة التي تمثلها؟", "messageLabel": "الجهة",
+          "type": "text", "placeholder": "اسم الجهة" },
+        { "when": ["professional"], "label": "ما هو مجال عملك؟", "messageLabel": "مجال العمل",
+          "type": "select", "options": "@sectors", "placeholder": "اختر المجال" }
+      ] },
+
+    { "key": "consent", "label": "أوافق على شروط التسجيل وسياسة الخصوصية", "columnLabel": "الموافقة على الشروط",
+      "type": "consent", "required": true, "inMessage": false,
+      "linkText": "قراءة الشروط وسياسة الخصوصية", "linkUrl": "privacy.html" },
+
+    { "key": "event", "type": "hidden", "value": "ملتقى عبور ٢٠٢٦", "columnLabel": "الفعالية", "inMessage": false }
+  ],
+
+  "whatsappMessage": "مرحباً، أرغب باستكمال تسجيلي في ملتقى عبور ٢٠٢٦.\n\n{{fields}}\n\nرقم التسجيل: {{id}}",
+
+  "texts": {
+    "submit": "تسجيل",
+    "saving": "جارٍ حفظ بياناتك…",
+    "openWhatsapp": "فتح واتساب وإرسال الرسالة",
+    "doneTitle": "اكتمل تسجيلك يا {{firstName}}",
+    "doneBody": "تأكد من أنك ضغطت «إرسال» في واتساب. سيصلك رد تلقائي على الرقم نفسه.",
+    "doneBodyNoWhatsapp": "شكراً لتسجيلك في ملتقى عبور ٢٠٢٦.",
+    "emailNote": "وأرسلنا تأكيد التسجيل إلى {{email}}.",
+    "pendingWhatsappTitle": "بقيت خطوة واحدة يا {{firstName}}",
+    "pendingWhatsappBody": "بياناتك محفوظة. افتح واتساب وأرسل الرسالة الجاهزة لاستكمال التسجيل. يمكنك فتحه مرة واحدة فقط.",
+    "duplicateDevice": "تم التسجيل من هذا الجهاز مسبقاً، ولا يمكن التسجيل مرة ثانية.",
+    "duplicateEmail": "هذا البريد الإلكتروني مسجّل مسبقاً، ولا يمكن التسجيل به مرة ثانية.",
+    "duplicatePhone": "هذا الرقم مسجّل مسبقاً، ولا يمكن التسجيل به مرة ثانية.",
+    "desktopTitle": "أكمل التسجيل من هاتفك",
+    "desktopBody": "التسجيل متاح من الهاتف فقط لأنه يكتمل عبر واتساب. امسح الرمز بكاميرا هاتفك لفتح الصفحة.",
+    "networkError": "تعذّر الاتصال بالخادم. تحقق من الإنترنت وحاول مرة أخرى.",
+    "requiredError": "هذا الحقل مطلوب",
+    "specifyError": "يرجى التحديد",
+    "consentError": "يجب الموافقة على شروط التسجيل وسياسة الخصوصية لإتمام التسجيل",
+    "otherPlaceholder": "يرجى التحديد",
+    "phoneError": "اكتب رقماً صحيحاً مع رمز الدولة (8 إلى 15 رقماً)",
+    "emailError": "اكتب بريداً إلكترونياً صحيحاً",
+    "demoBanner": "وضع تجريبي: لم يُضبط رابط Apps Script، فالبيانات لا تُحفظ."
+  }
+}

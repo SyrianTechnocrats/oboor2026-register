@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>التسجيل | التكنوقراط السوريون</title>
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="assets/mark.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link id="font-link" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;700&display=swap">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="demo-banner" id="demo-banner" hidden></div>
+
+  <main class="page">
+    <header class="brand">
+      <img id="logo" class="brand-logo" src="assets/logo.png" alt="التكنوقراط السوريون">
+    </header>
+
+    <section class="card" id="card" aria-live="polite">
+      <div class="state" id="state-loading">
+        <div class="spinner" aria-hidden="true"></div>
+      </div>
+
+      <!-- النموذج -->
+      <div class="state" id="state-form" hidden>
+        <img id="cover" class="cover" alt="" hidden>
+        <p class="eyebrow" id="eyebrow" hidden></p>
+        <h1 id="heading"></h1>
+        <p class="lead" id="subheading"></p>
+        <form id="form" novalidate>
+          <div id="fields" class="fields"></div>
+          <p class="form-error" id="form-error" role="alert" hidden></p>
+          <button type="submit" class="btn btn-primary" id="submit-btn">
+            <span class="btn-label" id="submit-label">تسجيل</span>
+          </button>
+        </form>
+      </div>
+
+      <!-- جهاز كمبيوتر -->
+      <div class="state state-center" id="state-desktop" hidden>
+        <h1 id="desktop-title"></h1>
+        <p class="lead" id="desktop-body"></p>
+        <div class="qr" id="qr"></div>
+        <p class="url-line" id="page-url" dir="ltr"></p>
+      </div>
+
+      <!-- تم الحفظ ولم يُفتح واتساب بعد -->
+      <div class="state state-center" id="state-pending" hidden>
+        <div class="badge badge-wait" aria-hidden="true">1</div>
+        <h1 id="pending-title"></h1>
+        <p class="lead" id="pending-body"></p>
+        <button type="button" class="btn btn-wa" id="wa-btn"></button>
+        <p class="reg-id" id="pending-id"></p>
+      </div>
+
+      <!-- مكتمل -->
+      <div class="state state-center" id="state-done" hidden>
+        <div class="badge badge-ok" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="30" height="30"><path d="M5 12.5l4.2 4.2L19 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <h1 id="done-title"></h1>
+        <p class="lead" id="done-body"></p>
+        <p class="reg-id" id="done-id"></p>
+      </div>
+
+      <!-- مسجّل مسبقاً -->
+      <div class="state state-center" id="state-blocked" hidden>
+        <div class="badge badge-stop" aria-hidden="true">!</div>
+        <p class="lead" id="blocked-body"></p>
+      </div>
+    </section>
+
+    <section class="partners" id="partners" hidden>
+      <h2 id="partners-title"></h2>
+      <ul id="partners-list"></ul>
+    </section>
+  </main>
+
+  <script src="vendor/qrcode.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
