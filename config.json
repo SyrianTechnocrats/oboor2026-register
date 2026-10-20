@@ -108,7 +108,7 @@
     { "key": "event", "type": "hidden", "value": "ملتقى عبور ٢٠٢٦", "columnLabel": "الفعالية", "inMessage": false }
   ],
 
-  "whatsappMessage": "مرحباً، أرغب باستكمال تسجيلي في ملتقى عبور ٢٠٢٦.\n\n{{fields}}\n\nرقم التسجيل: {{id}}",
+  "whatsappMessage": "مرحباً، أرغب باستكمال تسجيلي في ملتقى عبور ٢٠٢٦.\n\n{{fields}}\n\nرقم التسجيل: {{id}}\nرمز التحقق: {{code}}",
 
   "texts": {
     "submit": "تسجيل",

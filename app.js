@@ -480,10 +480,10 @@
     return { out: out, values: values };
   }
 
-  function buildMessage(data, id) {
+  function buildMessage(data, id, code) {
     var lines = data.out.filter(function (o) { return o.inMessage && o.value; })
       .map(function (o) { return (o.msgLabel || o.label) + ": " + (o.msgValue || o.value); });
-    var vars = Object.assign({}, data.values, { id: id || "", fields: lines.join("\n") });
+    var vars = Object.assign({}, data.values, { id: id || "", code: code || "", fields: lines.join("\n") });
     return fill(cfg.whatsappMessage || "{{fields}}", vars);
   }
 
@@ -495,7 +495,7 @@
   function postToServer(payload) {
     if (!apiEndpoint()) {
       return new Promise(function (res) {
-        setTimeout(function () { res({ ok: true, id: "TEST-" + Math.floor(Math.random() * 9000 + 1000), emailSent: false }); }, 600);
+        setTimeout(function () { res({ ok: true, id: "TEST-" + Math.floor(Math.random() * 9000 + 1000), code: "DEMO00", emailSent: false }); }, 600);
       });
     }
     return fetch(apiEndpoint(), {
@@ -595,7 +595,8 @@
           id: res.id, firstName: v.firstName, lastName: v.lastName, email: v.email || "",
           emailSent: res.emailSent, savedAt: new Date().toISOString(), waOpened: false
         };
-        rec.message = buildMessage(data, res.id);
+        rec.code = res.code || "";
+        rec.message = buildMessage(data, res.id, res.code);
         saveRecord(rec);
         if (waEnabled()) openWhatsappOnce(rec);
         else { rec.waOpened = true; saveRecord(rec); showDone(rec); }
