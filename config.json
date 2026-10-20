@@ -8,7 +8,7 @@
   "subheading": "ملتقى عبور للابتكار والاستثمار. يستغرق التسجيل أقل من دقيقة.",
 
   "whatsappNumber": "447861392622",
-  "scriptUrl": "",
+  "apiUrl": "",
   "allowDesktop": false,
 
   "logo": "assets/logo.png",
@@ -27,7 +27,7 @@
     "error": "#C62D3A",
     "success": "#13866A",
     "fontFamily": "IBM Plex Sans Arabic",
-    "fontUrl": "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;700&display=swap",
+    "fontUrl": "assets/fonts/fonts.css",
     "radius": "14px"
   },
 
@@ -130,6 +130,7 @@
     "otherPlaceholder": "يرجى التحديد",
     "phoneError": "اكتب رقماً صحيحاً مع رمز الدولة (8 إلى 15 رقماً)",
     "emailError": "اكتب بريداً إلكترونياً صحيحاً",
-    "demoBanner": "وضع تجريبي: لم يُضبط رابط Apps Script، فالبيانات لا تُحفظ."
+    "rateError": "محاولات كثيرة من هذه الشبكة. انتظر بضع دقائق ثم حاول مجدداً.",
+    "demoBanner": "وضع تجريبي: لم يُضبط رابط الخادم (apiUrl)، فالبيانات لا تُحفظ."
   }
 }

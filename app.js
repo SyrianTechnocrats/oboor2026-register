@@ -481,18 +481,23 @@
   }
 
   /* ---------- الخادم (Google Apps Script) ---------- */
+  function apiEndpoint() {
+    var base = String(cfg.apiUrl || "").replace(/\/+$/, "");
+    return base ? base + "/api/register" : "";
+  }
   function postToServer(payload) {
-    if (!cfg.scriptUrl) {
+    if (!apiEndpoint()) {
       return new Promise(function (res) {
         setTimeout(function () { res({ ok: true, id: "TEST-" + Math.floor(Math.random() * 9000 + 1000), emailSent: false }); }, 600);
       });
     }
-    return fetch(cfg.scriptUrl, {
+    return fetch(apiEndpoint(), {
       method: "POST",
-      headers: { "Content-Type": "text/plain;charset=utf-8" }, // يتجنب preflight مع Apps Script
-      body: JSON.stringify(payload),
-      redirect: "follow"
-    }).then(function (r) { return r.json(); });
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify(payload)
+    }).then(function (r) {
+      return r.json().catch(function () { return { ok: false, error: "server" }; });
+    });
   }
 
   /* ---------- الحالات ---------- */
@@ -595,8 +600,8 @@
         return;
       }
       throw new Error((res && res.error) || "server");
-    }).catch(function () {
-      errBox.textContent = t("networkError");
+    }).catch(function (err) {
+      errBox.textContent = err && err.message === "rate" ? (t("rateError") || t("networkError")) : t("networkError");
       errBox.hidden = false;
       resetButton();
     });
@@ -622,7 +627,7 @@
     fields = mergeFields(cfg.fields);
     renderBrand();
     renderFields();
-    if (!cfg.scriptUrl) { $("demo-banner").textContent = t("demoBanner"); $("demo-banner").hidden = false; }
+    if (!apiEndpoint()) { $("demo-banner").textContent = t("demoBanner"); $("demo-banner").hidden = false; }
     $("form").addEventListener("submit", onSubmit);
     getDeviceId();
     route();
