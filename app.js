@@ -33,7 +33,10 @@
   }
   function persist(k, v) { lsSet(k, v); cookieSet(k, v); }
   function recall(k) { return lsGet(k) || cookieGet(k); }
-  function storeKey() { return STORE_KEY + (cfg.eventId ? "_" + cfg.eventId : ""); }
+  // غيّر "resetVersion" في config.json لتنسى كل المتصفحات تسجيلاتها السابقة (بعد تصفير الخادم)
+  function storeKey() {
+    return STORE_KEY + (cfg.eventId ? "_" + cfg.eventId : "") + (cfg.resetVersion ? "_r" + cfg.resetVersion : "");
+  }
 
   function getDeviceId() {
     var id = recall(DEVICE_KEY);

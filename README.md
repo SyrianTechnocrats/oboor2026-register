@@ -87,6 +87,15 @@ docker compose exec app python3 server.py testmail you@example.com
 ### النسخ الاحتياطي
 كل البيانات في المجلد `server/data/`: قاعدة البيانات `registrations.db` ومفتاح التحقق `verify.key`. انسخ المجلد كاملاً دورياً.
 
+### تصفير التسجيلات (بعد التجربة)
+على الخادم — ينقل البيانات الحالية إلى مجلد نسخة احتياطية ويبدأ من جديد من OBR-0001 بمفتاح تحقق جديد:
+```bash
+cd /opt/oboor2026-register/server && sudo docker compose -f docker-compose.nginx.yml stop \
+ && B=data/backup-$(date +%Y%m%d-%H%M) && sudo mkdir -p $B && sudo mv data/registrations.db* data/verify.key $B/ \
+ ; sudo docker compose -f docker-compose.nginx.yml start
+```
+ثم زِد قيمة `resetVersion` في `config.json` بواحد، حتى تنسى الهواتف التي جرّبت التسجيل أنها سجّلت.
+
 ### الحماية
 - الخادم يقبل الطلبات فقط من `ALLOWED_ORIGINS` (صفحة GitHub Pages).
 - حد أقصى للطلبات من نفس الشبكة (`RATE_LIMIT_PER_10MIN`، الافتراضي 20 كل 10 دقائق).
